@@ -14,26 +14,15 @@ const GET_POST = 'GET_POST';
 const GET_POST_SUCCESS = 'GET_POST_SUCCESS';
 const GET_POST_ERROR = 'GET_POST_ERROR';
 
-export const getPosts = () => async (dispatch) => {
-  dispatch({ type: GET_POSTS });
-  try {
-    const posts = await postsApi.getPosts();
-    dispatch({ type: GET_POSTS_SUCCESS, posts });
-  } catch (e) {
-    dispatch({ type: GET_POSTS_ERROR, error: e });
-  }
-};
+export const getPosts = reducerUtils.createPromiseThunk(
+  GET_POSTS,
+  postsApi.getPosts
+);
 
-export const getPostById = (id) => async (dispatch) => {
-  dispatch({ type: GET_POST });
-
-  try {
-    const post = await postsApi.getPostById(id);
-    dispatch({ type: GET_POST_SUCCESS, post });
-  } catch (e) {
-    dispatch({ type: GET_POST_ERROR, error: e });
-  }
-};
+export const getPostById = reducerUtils.createPromiseThunk(
+  GET_POSTS_ERROR,
+  postsApi.getPostById
+);
 
 export default function posts(state = initialState, action) {
   switch (action.type) {
@@ -46,12 +35,12 @@ export default function posts(state = initialState, action) {
     case GET_POSTS_SUCCESS:
       return {
         ...state,
-        posts: reducerUtils.success(action.posts),
+        posts: reducerUtils.success(action.payload),
       };
     case GET_POSTS_ERROR:
       return {
         ...state,
-        posts: reducerUtils.error(action.error),
+        posts: reducerUtils.error(action.payload),
       };
     // post
     case GET_POST:
@@ -62,12 +51,12 @@ export default function posts(state = initialState, action) {
     case GET_POST_SUCCESS:
       return {
         ...state,
-        post: reducerUtils.success(action.post),
+        post: reducerUtils.success(action.payload),
       };
     case GET_POST_ERROR:
       return {
         ...state,
-        post: reducerUtils.error(action.error),
+        post: reducerUtils.error(action.payload),
       };
     default:
       return state;
