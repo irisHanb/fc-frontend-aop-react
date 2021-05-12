@@ -1,16 +1,9 @@
 import * as postsApi from '../api/posts';
+import { reducerUtils } from '../lib/asyncUtils';
 
 const initialState = {
-  posts: {
-    loading: false,
-    data: null,
-    error: null,
-  },
-  post: {
-    loading: false,
-    data: null,
-    error: null,
-  },
+  posts: reducerUtils.initial(),
+  post: reducerUtils.initial(),
 };
 
 const GET_POSTS = 'GET_POSTS';
