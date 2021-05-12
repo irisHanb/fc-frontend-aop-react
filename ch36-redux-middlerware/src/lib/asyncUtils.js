@@ -35,3 +35,31 @@ export const createPromiseThunk = (type, promiseCreator) => {
   };
   return thunkCreator;
 };
+
+export const handleAsyncActions = (type, key) => {
+  const [SUCCESS, ERROR] = [`${type}_SUCCESS`, `${type}_ERROR`];
+
+  const reducer = (state, action) => {
+    switch (action.type) {
+      case type:
+        return {
+          ...state,
+          [key]: reducerUtils.loading(),
+        };
+      case SUCCESS:
+        return {
+          ...state,
+          [key]: reducerUtils.success(action.playload),
+        };
+      case ERROR:
+        return {
+          ...state,
+          [key]: reducerUtils.error(action.playload),
+        };
+      default:
+        return state;
+    }
+  };
+
+  return reducer;
+};
