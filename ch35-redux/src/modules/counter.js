@@ -12,22 +12,21 @@ export const increse = () => ({ type: INCREASE });
 export const decrease = () => ({ type: DECREASE });
 
 export default function counter(state = initialState, action) {
-  const { number, diff } = action;
   switch (action.type) {
     case SET_DIFF:
       return {
         ...state,
-        diff,
+        diff: action.diff,
       };
     case INCREASE:
       return {
         ...state,
-        number: number + diff,
+        number: state.number + state.diff,
       };
     case DECREASE:
       return {
         ...state,
-        number: number - diff,
+        number: state.number - state.diff,
       };
     default:
       return state;
