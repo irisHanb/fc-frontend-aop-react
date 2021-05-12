@@ -19,13 +19,9 @@ const GET_POST_SUCCESS = 'GET_POST_SUCCESS';
 const GET_POST_ERROR = 'GET_POST_ERROR';
 
 export const getPosts = createPromiseThunk(GET_POSTS, postsApi.getPosts);
+export const getPost = createPromiseThunk(GET_POST, postsApi.getPostById);
 
-export const getPostById = createPromiseThunk(
-  GET_POSTS_ERROR,
-  postsApi.getPostById
-);
-
-const getPostsReducer = handleAsyncActions(GET_POSTS, 'posts');
+const getPostsReducer = handleAsyncActions(GET_POSTS, 'posts', true);
 const getPostReducer = handleAsyncActions(GET_POST, 'post');
 
 export default function posts(state = initialState, action) {
