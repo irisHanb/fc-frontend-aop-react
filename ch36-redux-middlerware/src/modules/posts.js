@@ -22,9 +22,15 @@ const GET_POST_ERROR = 'GET_POST_ERROR';
 
 const CLEAR_POST = 'CLEAR_POST';
 
+// thunk
 export const getPosts = createPromiseThunk(GET_POSTS, postsApi.getPosts);
 export const getPost = createPromiseThunkById(GET_POST, postsApi.getPostById);
 export const clearPost = () => ({ type: CLEAR_POST });
+export const goHome =
+  () =>
+  (dispatch, getState, { history }) => {
+    history.push('/');
+  };
 
 // reducer
 const getPostsReducer = handleAsyncActions(GET_POSTS, 'posts', true);
