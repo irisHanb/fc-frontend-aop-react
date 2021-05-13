@@ -7,7 +7,7 @@ import {
 
 const initialState = {
   posts: reducerUtils.initial(),
-  post: reducerUtils.initial(),
+  post: {},
 };
 
 const GET_POSTS = 'GET_POSTS';
@@ -21,11 +21,53 @@ const GET_POST_ERROR = 'GET_POST_ERROR';
 const CLEAR_POST = 'CLEAR_POST';
 
 export const getPosts = createPromiseThunk(GET_POSTS, postsApi.getPosts);
-export const getPost = createPromiseThunk(GET_POST, postsApi.getPostById);
+// export const getPost = createPromiseThunk(GET_POST, postsApi.getPostById);
+export const getPost = (id) => async (dispatch) => {
+  dispatch({ type: GET_POST, meta: id });
+  try {
+    const payload = await postsApi.getPostById(id);
+    dispatch({ type: GET_POST_SUCCESS, payload, meta: id });
+  } catch (e) {
+    dispatch({ type: GET_POST_ERROR, payloa: e, error: true, meta: id });
+  }
+};
 export const clearPost = () => ({ type: CLEAR_POST });
 
+// reducer
 const getPostsReducer = handleAsyncActions(GET_POSTS, 'posts', true);
-const getPostReducer = handleAsyncActions(GET_POST, 'post');
+// const getPostReducer = handleAsyncActions(GET_POST, 'post');
+
+const getPostReducer = (state, action) => {
+  const id = action.meta;
+  switch (action.type) {
+    case GET_POST:
+      return {
+        ...state,
+        post: {
+          ...state.post,
+          [id]: reducerUtils.loading(state.post[id]?.data),
+        },
+      };
+    case GET_POST_SUCCESS:
+      return {
+        ...state,
+        post: {
+          ...state,
+          [id]: reducerUtils.success(action.payload),
+        },
+      };
+    case GET_POST_ERROR:
+      return {
+        ...state,
+        post: {
+          ...state,
+          [id]: reducerUtils.error(action.payload),
+        },
+      };
+    default:
+      return state;
+  }
+};
 
 export default function posts(state = initialState, action) {
   switch (action.type) {
