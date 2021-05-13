@@ -1,4 +1,4 @@
-import PostContainer from '../Containers/PostContainer';
+import PostContainer from '../containers/PostContainer';
 
 function PostPage({ match }) {
   const { id } = match.params;
