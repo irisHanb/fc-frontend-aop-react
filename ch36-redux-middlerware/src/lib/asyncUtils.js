@@ -9,11 +9,13 @@ export const reducerUtils = {
     loading: true,
     error: null,
   }),
-  success: (data) => ({
-    data,
-    loading: false,
-    error: null,
-  }),
+  success: (data) => {
+    return {
+      data,
+      loading: false,
+      error: null,
+    };
+  },
   error: (error) => ({
     data: null,
     loading: false,
@@ -27,10 +29,10 @@ export const createPromiseThunk = (type, promiseCreator) => {
   const thunkCreator = (param) => async (dispatch) => {
     dispatch({ type });
     try {
-      const playload = await promiseCreator(param);
-      dispatch({ type: SUCCESS, playload });
+      const payload = await promiseCreator(param);
+      dispatch({ type: SUCCESS, payload });
     } catch (e) {
-      dispatch({ type: ERROR, playload: e, error: true });
+      dispatch({ type: ERROR, payload: e, error: true });
     }
   };
   return thunkCreator;
@@ -49,12 +51,12 @@ export const handleAsyncActions = (type, key, keepData) => {
       case SUCCESS:
         return {
           ...state,
-          [key]: reducerUtils.success(action.playload),
+          [key]: reducerUtils.success(action.payload),
         };
       case ERROR:
         return {
           ...state,
-          [key]: reducerUtils.error(action.playload),
+          [key]: reducerUtils.error(action.payload),
         };
       default:
         return state;
@@ -90,6 +92,7 @@ export const handleAsyncActionsById = (type, key, keepData) => {
 
   const reducer = (state, action) => {
     const id = action.meta;
+    console.log('>>>', type, action.type, action);
     switch (action.type) {
       case type:
         return {

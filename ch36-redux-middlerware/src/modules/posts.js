@@ -1,7 +1,6 @@
+import { call, put, takeEvery } from '@redux-saga/core/effects';
 import * as postsApi from '../api/posts';
 import {
-  createPromiseThunk,
-  createPromiseThunkById,
   handleAsyncActions,
   handleAsyncActionsById,
   reducerUtils,
@@ -22,51 +21,64 @@ const GET_POST_ERROR = 'GET_POST_ERROR';
 
 const CLEAR_POST = 'CLEAR_POST';
 
-// thunk
-export const getPosts = createPromiseThunk(GET_POSTS, postsApi.getPosts);
-export const getPost = createPromiseThunkById(GET_POST, postsApi.getPostById);
+export const getPosts = () => ({ type: GET_POSTS });
+export const getPost = (id) => ({
+  type: GET_POST,
+  payload: id,
+  meta: id,
+});
 export const clearPost = () => ({ type: CLEAR_POST });
+
 export const goHome =
   () =>
   (dispatch, getState, { history }) => {
     history.push('/');
   };
 
+// saga
+function* getPostsSaga() {
+  try {
+    const posts = yield call(postsApi.getPosts);
+    yield put({
+      type: GET_POSTS_SUCCESS,
+      payload: posts,
+    });
+  } catch (e) {
+    yield put({
+      type: GET_POSTS_ERROR,
+      payload: e,
+      error: true,
+    });
+  }
+}
+function* getPostSaga(action) {
+  const id = action.payload;
+
+  try {
+    const post = yield call(postsApi.getPostById, id);
+
+    yield put({
+      type: GET_POST_SUCCESS,
+      payload: post,
+      meta: id,
+    });
+  } catch (e) {
+    yield put({
+      type: GET_POST_ERROR,
+      payload: e,
+      error: true,
+      meta: id,
+    });
+  }
+}
+export function* postsSaga() {
+  yield takeEvery(GET_POSTS, getPostsSaga);
+  yield takeEvery(GET_POST, getPostSaga);
+}
+
 // reducer
 const getPostsReducer = handleAsyncActions(GET_POSTS, 'posts', true);
 const getPostReducer = handleAsyncActionsById(GET_POST, 'post', true);
-
-// const getPostReducer = (state, action) => {
-//   const id = action.meta;
-//   switch (action.type) {
-//     case GET_POST:
-//       return {
-//         ...state,
-//         post: {
-//           ...state.post,
-//           [id]: reducerUtils.loading(state.post[id]?.data),
-//         },
-//       };
-//     case GET_POST_SUCCESS:
-//       return {
-//         ...state,
-//         post: {
-//           ...state,
-//           [id]: reducerUtils.success(action.payload),
-//         },
-//       };
-//     case GET_POST_ERROR:
-//       return {
-//         ...state,
-//         post: {
-//           ...state,
-//           [id]: reducerUtils.error(action.payload),
-//         },
-//       };
-//     default:
-//       return state;
-//   }
-// };
 
 export default function posts(state = initialState, action) {
   switch (action.type) {
